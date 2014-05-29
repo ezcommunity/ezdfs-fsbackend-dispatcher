@@ -227,11 +227,8 @@ class eZDFSFileHandlerDFSDispatcher implements eZDFSFileHandlerDFSBackendInterfa
         return $this->getHandler( $filePath )->getDfsFileSize( $filePath );
     }
 
-    /**
-     * @todo bad interfaces splitting, refactor with a DispatchableDFSHandler or something
-     */
-    public function supports( $path )
+    public function getFilesList( $basePath )
     {
-        return false;
+        // TODO: Implement getFilesList() method.
     }
 }

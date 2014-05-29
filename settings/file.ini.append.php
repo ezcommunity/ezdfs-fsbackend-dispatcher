@@ -1,4 +1,4 @@
 <?php /*
 
 [eZDFSClusteringSettings]
-DFSBackend=eZDFSFileHandlerDFSDispatcher
+#DFSBackend=eZDFSFileHandlerDFSDispatcher
