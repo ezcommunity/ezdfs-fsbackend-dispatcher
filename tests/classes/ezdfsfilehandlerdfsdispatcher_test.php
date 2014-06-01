@@ -54,7 +54,8 @@ class eZDFSFileHandlerDFSDispatcherTest extends ezpTestCase
         $this->customHandler
             ->expects( $this->once() )
             ->method( 'copyFromDFSToDFS' )
-            ->with( $srcPath, $dstPath );
+            ->with( $srcPath, $dstPath )
+            ->will( $this->returnValue( true ) );
 
         self::assertTrue( $this->dispatcher->copyFromDFSToDFS( $srcPath, $dstPath ) );
     }
