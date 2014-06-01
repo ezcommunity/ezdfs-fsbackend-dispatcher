@@ -9,7 +9,7 @@
  */
 
 /**
- * DFS FS handler that dispatches calls to the appropriate FS handler
+ * DFS FS handler that dispatches/proxies calls to a sub-handler.
  */
 class eZDFSFileHandlerDFSDispatcher implements eZDFSFileHandlerDFSBackendInterface
 {
@@ -17,7 +17,7 @@ class eZDFSFileHandlerDFSDispatcher implements eZDFSFileHandlerDFSBackendInterfa
     private $fsHandlersRegistry = array();
 
     /**
-     * @param eZDFSFileHandlerDFSRegistry $fsHandlers
+     * @param eZDFSFileHandlerDFSRegistry $fsHandlersRegistry
      */
     public function __construct( eZDFSFileHandlerDFSRegistry $fsHandlersRegistry )
     {
@@ -25,28 +25,18 @@ class eZDFSFileHandlerDFSDispatcher implements eZDFSFileHandlerDFSBackendInterfa
     }
 
     /**
+     * Instantiates the dispatcher using either $handlers, or eZDFSClusteringSettings.DFSBackends from file.ini.
+     *
+     * @param array $handlers
      * @return self
+     *
+     * @throws Exception if two wildcard handlers are configured
+     * @throws Exception if no wildcard handler is configured
+     * @throws Exception if a handler doesn't implement eZDFSFileHandlerDFSBackendInterface
      */
     public static function factory()
     {
-        $handlers = array();
-        $ini = eZINI::instance( 'file.ini' );
-        foreach ( $ini->variable( 'eZDFSClusteringSettings', 'DFSBackends' ) as $backend )
-        {
-            $backendIniGroup = "DFSBackend_$backend";
-            $class = $ini->variable( $backendIniGroup, 'Class' );
-            if ( $ini->hasVariable( $backendIniGroup, 'FactoryMethod' ) )
-            {
-                $handler = $class::factory();
-            }
-            else
-            {
-                $handler = new $class;
-            }
-            $handlers[] = $handler;
-        }
-
-        return new self( new eZDFSFileHandlerDFSRegistry( $handlers ) );
+        return new self( eZDFSFileHandlerDFSRegistry::build() );
     }
 
     /**
@@ -64,6 +54,8 @@ class eZDFSFileHandlerDFSDispatcher implements eZDFSFileHandlerDFSBackendInterfa
      *
      * @param string $srcFilePath Local source file path
      * @param string $dstFilePath Local destination file path
+     *
+     * @return bool
      */
     public function copyFromDFSToDFS( $srcFilePath, $dstFilePath )
     {
@@ -84,9 +76,7 @@ class eZDFSFileHandlerDFSDispatcher implements eZDFSFileHandlerDFSBackendInterfa
      * Copies the DFS file $srcFilePath to FS
      *
      * @param string $srcFilePath Source file path (on DFS)
-     * @param string $dstFilePath
-     *        Destination file path (on FS). If not specified, $srcFilePath is
-     *        used
+     * @param string|bool $dstFilePath Destination file path (on FS). If not specified, $srcFilePath is used
      *
      * @return bool
      */
@@ -113,8 +103,7 @@ class eZDFSFileHandlerDFSDispatcher implements eZDFSFileHandlerDFSBackendInterfa
     /**
      * Deletes one or more files from DFS
      *
-     * @param string|array $filePath
-     *        Single local filename, or array of local filenames
+     * @param string|array $filePath Single local filename, or array of local filenames
      *
      * @return bool true if deletion was successful, false otherwise
      * @todo Improve error handling using exceptions
@@ -127,8 +116,8 @@ class eZDFSFileHandlerDFSDispatcher implements eZDFSFileHandlerDFSBackendInterfa
     /**
      * Sends the contents of $filePath to default output
      *
-     * @param string   $filePath File path
-     * @param int      $startOffset Starting offset
+     * @param string $filePath File path
+     * @param int $startOffset Starting offset
      * @param bool|int $length Length to transmit, false means everything
      *
      * @return bool true, or false if operation failed

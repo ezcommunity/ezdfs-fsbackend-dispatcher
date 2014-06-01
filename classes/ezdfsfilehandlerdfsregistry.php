@@ -15,15 +15,33 @@
  */
 class eZDFSFileHandlerDFSRegistry implements eZDFSFileHandlerDFSRegistryInterface
 {
-    /** @var eZDFSFileHandlerDFSBackendInterface[] */
-    private $fsHandlers = array();
+    /**
+     * Handlers based on path (as key)
+     * @var eZDFSFileHandlerDFSBackendInterface[string] */
+    private $pathHandlers = array();
 
     /**
-     * @param eZDFSFileHandlerDFSBackendInterface[] $fsHandlers
+     * The default handler, used when no {@see $pathHandlers} matches
+     * @var eZDFSFileHandlerDFSBackendInterface
      */
-    public function __construct( array $fsHandlers = array() )
+    private $defaultHandler;
+
+    /**
+     * @param eZDFSFileHandlerDFSBackendInterface $defaultHandler
+     * @param eZDFSFileHandlerDFSBackendInterface[] $pathHandlers
+     */
+    public function __construct( eZDFSFileHandlerDFSBackendInterface $defaultHandler, array $pathHandlers = array() )
     {
-        $this->fsHandlers = $fsHandlers;
+        foreach ( $pathHandlers as $supportedPath => $handler )
+        {
+            if ( !$handler instanceof eZDFSFileHandlerDFSBackend )
+            {
+                throw new InvalidArgumentException( get_class( $handler ) . " does not implement eZDFSFileHandlerDFSBackend" );
+            }
+        }
+
+        $this->defaultHandler = $defaultHandler;
+        $this->pathHandlers = $pathHandlers;
     }
 
     /**
@@ -34,14 +52,35 @@ class eZDFSFileHandlerDFSRegistry implements eZDFSFileHandlerDFSRegistryInterfac
      */
     public function getHandler( $path )
     {
-        foreach ( $this->fsHandlers as $handler )
+        foreach ( $this->pathHandlers as $supportedPath => $handler )
         {
-            if ( $handler->supports( $path ) )
+            if ( strstr( $path, $supportedPath ) !== false )
             {
                 return $handler;
             }
         }
 
-        throw new OutOfRangeException( "No handler found with support for $path" );
+        return $this->defaultHandler;
+    }
+
+    /**
+     * Builds a registry using either the provided configuration, or settings from self::getConfiguration
+     * @return self
+     */
+    public static function build()
+    {
+        $ini = eZINI::instance( 'dispatchabledfs.ini' );
+        $defaultHandler = eZDFSFileHandlerBackendFactory::buildHandler(
+            $ini->variable( 'DispatchableDFS', 'DefaultBackend' )
+        );
+
+        $pathHandlers = array();
+        foreach ( $ini->variable( 'DispatchableDFS', 'PathBackends' ) as $supportedPath => $backendClass )
+        {
+            // @todo Make it possible to use a Symfony2 service
+            $pathHandlers[$supportedPath] = eZDFSFileHandlerBackendFactory::buildHandler( $backendClass );
+        }
+
+        return new self( $defaultHandler, $pathHandlers );
     }
 }
