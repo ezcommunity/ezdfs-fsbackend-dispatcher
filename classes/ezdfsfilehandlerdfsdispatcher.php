@@ -11,7 +11,7 @@
 /**
  * DFS FS handler that dispatches/proxies calls to a sub-handler.
  */
-class eZDFSFileHandlerDFSDispatcher implements eZDFSFileHandlerDFSBackendInterface
+class eZDFSFileHandlerDFSDispatcher implements eZDFSFileHandlerDFSBackendInterface, eZDFSFileHandlerDFSBackendFactoryInterface
 {
     /** @var eZDFSFileHandlerDFSRegistry */
     private $fsHandlersRegistry = array();
@@ -25,16 +25,10 @@ class eZDFSFileHandlerDFSDispatcher implements eZDFSFileHandlerDFSBackendInterfa
     }
 
     /**
-     * Instantiates the dispatcher using either $handlers, or eZDFSClusteringSettings.DFSBackends from file.ini.
-     *
-     * @param array $handlers
+     * Instantiates the dispatcher
      * @return self
-     *
-     * @throws Exception if two wildcard handlers are configured
-     * @throws Exception if no wildcard handler is configured
-     * @throws Exception if a handler doesn't implement eZDFSFileHandlerDFSBackendInterface
      */
-    public static function factory()
+    public static function build()
     {
         return new self( eZDFSFileHandlerDFSRegistry::build() );
     }

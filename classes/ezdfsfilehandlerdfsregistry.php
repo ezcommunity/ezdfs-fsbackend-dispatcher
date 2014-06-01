@@ -34,9 +34,9 @@ class eZDFSFileHandlerDFSRegistry implements eZDFSFileHandlerDFSRegistryInterfac
     {
         foreach ( $pathHandlers as $supportedPath => $handler )
         {
-            if ( !$handler instanceof eZDFSFileHandlerDFSBackend )
+            if ( !$handler instanceof eZDFSFileHandlerDFSBackendInterface )
             {
-                throw new InvalidArgumentException( get_class( $handler ) . " does not implement eZDFSFileHandlerDFSBackend" );
+                throw new InvalidArgumentException( get_class( $handler ) . " does not implement eZDFSFileHandlerDFSBackendInterface" );
             }
         }
 

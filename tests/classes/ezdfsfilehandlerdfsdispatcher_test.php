@@ -11,9 +11,10 @@
  * Tests the dispatcher using two handlers in the registry.
  *
  * The registry will dispatch based on the path prefixes: "one://" and "two://".
- * Handler mocks can be obtained via {@see getHandlerOne()} and {@see getHandlerTwo()}
+ * Handler mocks can be obtained via {@see customHandler} and {@see defaultHandler}
  *
  * @covers eZDFSFileHandlerDFSDispatcher
+ * @group eZDispatchableDFS
  */
 class eZDFSFileHandlerDFSDispatcherTest extends ezpTestCase
 {
@@ -21,27 +22,27 @@ class eZDFSFileHandlerDFSDispatcherTest extends ezpTestCase
     private $dispatcher;
 
     /** @var eZDFSFileHandlerDFSBackendInterface[]|PHPUnit_Framework_MockObject_MockObject */
-    private $handlerOne;
+    private $customHandler;
 
     /** @var eZDFSFileHandlerDFSBackendInterface[]|PHPUnit_Framework_MockObject_MockObject */
     private $handlerTwo;
 
+    /**
+     * The test setup will use two handlers.
+     *
+     * The first one, $handlerOne, will match the path one://
+     * The second one will match anything
+     */
     public function setUp()
     {
-        $this->handlerOne = $this->getMock( 'eZDFSFileHandlerDFSBackendInterface' );
-        $this->handlerOne
-            ->expects( $this->any() )
-            ->method( 'supports' )
-            ->will( $this->returnCallback( function ( $path ) { return substr( $path, 0, 6 ) == 'one://'; } ) );
-
-        $this->handlerTwo = $this->getMock( 'eZDFSFileHandlerDFSBackendInterface' );
-        $this->handlerTwo
-            ->expects( $this->any() )
-            ->method( 'supports' )
-            ->will( $this->returnCallback( function ( $path ) { return substr( $path, 0, 6 ) == 'two://'; } ) );
+        $this->customHandler = $this->getMock( 'eZDFSFileHandlerDFSBackendInterface' );
+        $this->defaultHandler = $this->getMock( 'eZDFSFileHandlerDFSBackendInterface' );
 
         $this->dispatcher = new eZDFSFileHandlerDFSDispatcher(
-            new eZDFSFileHandlerDFSRegistry( array( $this->handlerOne, $this->handlerTwo ) )
+            new eZDFSFileHandlerDFSRegistry(
+                $this->defaultHandler,
+                array( 'one://' => $this->customHandler )
+            )
         );
     }
 
@@ -50,7 +51,7 @@ class eZDFSFileHandlerDFSDispatcherTest extends ezpTestCase
         $srcPath = 'one://source_file';
         $dstPath = 'one://dest_file';
 
-        $this->getHandlerOne()
+        $this->customHandler
             ->expects( $this->once() )
             ->method( 'copyFromDFSToDFS' )
             ->with( $srcPath, $dstPath );
@@ -64,13 +65,13 @@ class eZDFSFileHandlerDFSDispatcherTest extends ezpTestCase
         $dstPath = "two://dst_file";
         $contents = __FILE__;
 
-        $this->getHandlerOne()
+        $this->customHandler
             ->expects( $this->once() )
             ->method( 'getContents' )
             ->with( $srcPath )
             ->will( $this->returnValue( $contents ) );
 
-        $this->getHandlerTwo()
+        $this->defaultHandler
             ->expects( $this->once() )
             ->method( 'createFileOnDFS' )
             ->with( $dstPath, $contents )
@@ -85,7 +86,7 @@ class eZDFSFileHandlerDFSDispatcherTest extends ezpTestCase
     {
         $srcPath = 'one://source_file';
 
-        $this->getHandlerOne()
+        $this->customHandler
             ->expects( $this->once() )
             ->method( 'copyFromDFS' )
             ->with( $srcPath )
@@ -101,7 +102,7 @@ class eZDFSFileHandlerDFSDispatcherTest extends ezpTestCase
         $srcPath = '/tmp/source_file';
         $dstPath = 'one://source_file';
 
-        $this->getHandlerOne()
+        $this->customHandler
             ->expects( $this->once() )
             ->method( 'copyToDFS' )
             ->with( $srcPath, $dstPath )
@@ -116,7 +117,7 @@ class eZDFSFileHandlerDFSDispatcherTest extends ezpTestCase
     {
         $path = 'one://file';
 
-        $this->getHandlerOne()
+        $this->customHandler
             ->expects( $this->once() )
             ->method( 'delete' )
             ->with( $path )
@@ -131,7 +132,7 @@ class eZDFSFileHandlerDFSDispatcherTest extends ezpTestCase
     {
         $path = 'one://file';
 
-        $this->getHandlerOne()
+        $this->customHandler
             ->expects( $this->once() )
             ->method( 'passthrough' )
             ->with( $path )
@@ -146,7 +147,7 @@ class eZDFSFileHandlerDFSDispatcherTest extends ezpTestCase
     {
         $path = 'one://file';
 
-        $this->getHandlerOne()
+        $this->customHandler
             ->expects( $this->once() )
             ->method( 'getContents' )
             ->with( $path )
@@ -163,7 +164,7 @@ class eZDFSFileHandlerDFSDispatcherTest extends ezpTestCase
         $path = 'one://file';
         $contents = __FILE__;
 
-        $this->getHandlerOne()
+        $this->customHandler
             ->expects( $this->once() )
             ->method( 'createFileOnDFS' )
             ->with( $path, $contents )
@@ -179,7 +180,7 @@ class eZDFSFileHandlerDFSDispatcherTest extends ezpTestCase
         $oldPath = "one://old_file";
         $newPath = "one://new_file";
 
-        $this->getHandlerOne()
+        $this->customHandler
             ->expects( $this->once() )
             ->method( 'renameOnDFS' )
             ->with( $oldPath, $newPath )
@@ -194,19 +195,19 @@ class eZDFSFileHandlerDFSDispatcherTest extends ezpTestCase
         $newPath = "two://new_file";
         $contents = __FILE__;
 
-        $this->getHandlerOne()
+        $this->customHandler
             ->expects( $this->once() )
             ->method( 'getContents' )
             ->with( $oldPath )
             ->will( $this->returnValue( $contents ) );
 
-        $this->getHandlerTwo()
+        $this->defaultHandler
             ->expects( $this->once() )
             ->method( 'createFileOnDFS' )
             ->with( $newPath, $contents )
             ->will( $this->returnValue( true ) );
 
-        $this->getHandlerOne()
+        $this->customHandler
             ->expects( $this->once() )
             ->method( 'delete' )
             ->with( $oldPath )
@@ -220,7 +221,7 @@ class eZDFSFileHandlerDFSDispatcherTest extends ezpTestCase
         $path = 'one://file';
         $size = 12345;
 
-        $this->getHandlerOne()
+        $this->customHandler
             ->expects( $this->once() )
             ->method( 'getDfsFileSize' )
             ->with( $path )
@@ -236,7 +237,7 @@ class eZDFSFileHandlerDFSDispatcherTest extends ezpTestCase
     {
         $path = 'one://file';
 
-        $this->getHandlerOne()
+        $this->customHandler
             ->expects( $this->once() )
             ->method( 'existsOnDFS' )
             ->with( $path )
@@ -245,30 +246,6 @@ class eZDFSFileHandlerDFSDispatcherTest extends ezpTestCase
         self::assertTrue(
             $this->dispatcher->existsOnDFS( $path )
         );
-    }
-
-    /**
-     * @return eZDFSFileHandlerDFSBackendInterface[]|PHPUnit_Framework_MockObject_MockObject
-     */
-    private function getHandlerOne()
-    {
-        return $this->handlerOne;
-    }
-
-    /**
-     * @return eZDFSFileHandlerDFSBackendInterface[]|PHPUnit_Framework_MockObject_MockObject
-     */
-    private function getHandlerTwo()
-    {
-        return $this->handlerTwo;
-    }
-
-    /**
-     * @return eZDFSFileHandlerDFSBackendInterface[]|PHPUnit_Framework_MockObject_MockObject
-     */
-    private function getDefaultHandlerMock()
-    {
-        return $this->getHandlerMock( 0 );
     }
 
     /**
