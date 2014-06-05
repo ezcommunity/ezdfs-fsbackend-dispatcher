@@ -40,7 +40,9 @@ class eZDFSFileHandlerDFSDispatcher implements eZDFSFileHandlerDFSBackendInterfa
      */
     private function getHandler( $path )
     {
-        return $this->fsHandlersRegistry->getHandler( $path );
+        $handler = $this->fsHandlersRegistry->getHandler( $path );
+        eZDebug::writeDebug( "getHandler( $path ): " . get_class( $handler ) );
+        return $handler;
     }
 
     /**
