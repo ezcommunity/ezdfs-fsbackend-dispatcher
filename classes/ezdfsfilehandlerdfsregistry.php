@@ -69,7 +69,7 @@ class eZDFSFileHandlerDFSRegistry implements eZDFSFileHandlerDFSRegistryInterfac
      */
     public static function build()
     {
-        $ini = eZINI::instance( 'dispatchabledfs.ini' );
+        $ini = eZINI::instance( 'file.ini' );
         $defaultHandler = eZDFSFileHandlerBackendFactory::buildHandler(
             $ini->variable( 'DispatchableDFS', 'DefaultBackend' )
         );
