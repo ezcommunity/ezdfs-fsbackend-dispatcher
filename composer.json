@@ -1,5 +1,5 @@
 {
-    "name": "ezsystels/ezdfs-fsbackend-dispatcher",
+    "name": "ezsystems/ezdfs-fsbackend-dispatcher",
     "description": "eZ Publish Dispatcher DFS backend",
     "type": "ezpublish-legacy-extension",
     "license": "GPL-2.0",
