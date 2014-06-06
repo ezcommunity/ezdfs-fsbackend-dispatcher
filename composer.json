@@ -1,16 +1,21 @@
 {
-    "name": "bdunogier/ezdispatchabledfs",
-    "description": "Dispatcher DFS backend",
+    "name": "ezsystels/ezdfs-fsbackend-dispatcher",
+    "description": "eZ Publish Dispatcher DFS backend",
     "type": "ezpublish-legacy-extension",
     "license": "GPL-2.0",
     "authors": [
         {
+            "name": "eZ Systems",
+            "homepage": "https://ez.no"
+        },
+        {
             "name": "Bertrand Dunogier",
-            "homepage": "https://github.com/bdunogier/ezdispatchabledfs"
+            "homepage": "https://github.com/bdunogier"
         }
     ],
     "minimum-stability": "dev",
     "require": {
+        "ezsystems/ezpublish-legacy": "5.4.0-alpha1",
         "ezsystems/ezpublish-legacy-installer": "*",
         "aws/aws-sdk-php": "*"
     },
@@ -19,6 +24,6 @@
         "mockery/mockery": "dev-master"
     },
     "extra": {
-        "ezpublish-legacy-extension-name": "ezdispatchabledfs"
+        "ezpublish-legacy-extension-name": "ezdfs-fsbackend-dispatcher"
     }
 }
