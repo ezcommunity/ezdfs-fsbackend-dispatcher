@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<software>
+    <metadata>
+        <name>eZ DFS Dispatcher Backend</name>
+        <version>//autogentag//</version>
+        <copyright>Copyright (C) eZ Systems AS. All rights reserved.</copyright>
+        <license>This software is distributed under same license as eZ Publish</license>
+        <info_url>https://github.com/ezsystems/ezdfs-fsbackend-dispatcher</info_url>
+    </metadata>
+</software>
