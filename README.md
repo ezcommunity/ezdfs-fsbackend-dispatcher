@@ -8,23 +8,27 @@ based on the path of the file.
 
 It makes it possible to store some storage subdirectories to custom handlers, such as a cloud based one.
 
-## Status
-Working prototype, close from first release.
+## Actual handlers
+An AWS-S3 handler, that stores binary files to Amazon S3, is available: http://github.com/ezsystems/ezdfs-fsbackend-aws-s3.
 
 ## Requirements
-- eZ Publish installed from git, with the EZP-22960-configurable_dfs_backend branch checked out.
+- eZ Publish master (5.4.0-dev or 2014.05).
 - eZ DFS configured (NFS itself doesn't matter, a local directory will work just as fine)
 
 ## Installation
+
+### Using composer
 It can be installed via composer from eZ Publish, new stack or legacy:
 ```
-composer require "ezsystems/ezdfs-fsbackend-dispatcher:dev-master"
+composer require "ezsystems/ezdfs-fsbackend-dispatcher:1.0-beta"
 ```
+Or by adding `"ezsystems/ezdfs-fsbackend-dispatcher": "1.0-beta"` to your project's composer.json.
 
-Or by adding `"ezsystems/ezdfs-fsbackend-dispatcher": "dev-master"` to your project's composer.json.
-
-It can also be manually checked out from http://github.com/ezsystems/ezsystems/ezdfs-fsbackend-dispatcher.git into the
-legacy `extension` directory.
+### Manually
+```
+cd ezpublish_legacy/extension
+git clone http://github.com/ezsystems/ezsystems/ezdfs-fsbackend-dispatcher.git
+```
 
 ## Configuration
 Due to INI settings loading order limitations, some settings can't be stored into extension INI files but in a global override.
