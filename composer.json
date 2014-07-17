@@ -24,7 +24,7 @@
     },
     "extra": {
         "ezpublish-legacy-extension-name": "ezdfs-fsbackend-dispatcher"
-    }
+    },
     "suggest": {
         "ezsystems/ezdfs-fsbackend-aws-s3": "Store and serve binary files to an Amazon S3 bucket"
     }
