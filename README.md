@@ -24,12 +24,6 @@ composer require "ezsystems/ezdfs-fsbackend-dispatcher:1.0-beta"
 ```
 Or by adding `"ezsystems/ezdfs-fsbackend-dispatcher": "1.0-beta"` to your project's composer.json.
 
-### Manually
-```
-cd ezpublish_legacy/extension
-git clone http://github.com/ezsystems/ezsystems/ezdfs-fsbackend-dispatcher.git
-```
-
 ## Configuration
 Due to INI settings loading order limitations, some settings can't be stored into extension INI files but in a global override.
 
