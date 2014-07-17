@@ -20,9 +20,9 @@ An AWS-S3 handler, that stores binary files to Amazon S3, is available: http://g
 ### Using composer
 It can be installed via composer from eZ Publish, new stack or legacy:
 ```
-composer require "ezsystems/ezdfs-fsbackend-dispatcher:1.0-beta"
+composer require "ezsystems/ezdfs-fsbackend-dispatcher:1.0@beta"
 ```
-Or by adding `"ezsystems/ezdfs-fsbackend-dispatcher": "1.0-beta"` to your project's composer.json.
+Or by adding `"ezsystems/ezdfs-fsbackend-dispatcher": "1.0@beta"` to your project's composer.json.
 
 ## Configuration
 Due to INI settings loading order limitations, some settings can't be stored into extension INI files but in a global override.
