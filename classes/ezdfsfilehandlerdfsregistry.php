@@ -54,9 +54,22 @@ class eZDFSFileHandlerDFSRegistry implements eZDFSFileHandlerDFSRegistryInterfac
     {
         foreach ( $this->pathHandlers as $supportedPath => $handler )
         {
-            if ( strstr( $path, $supportedPath ) !== false )
+            if ( is_array( $path ) )
             {
-                return $handler;
+                foreach ( $path as $p )
+                {
+                    if ( strstr( $path, $supportedPath ) !== false )
+                    {
+                        return $handler;
+                    }
+                }
+            }
+            else
+            {
+                if ( strstr( $path, $supportedPath ) !== false )
+                {
+                    return $handler;
+                }
             }
         }
 
