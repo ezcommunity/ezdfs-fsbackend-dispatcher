@@ -35,8 +35,8 @@ class eZDFSFileHandlerDFSDispatcherTest extends ezpTestCase
      */
     public function setUp()
     {
-        $this->customHandler = $this->getMock( 'eZDFSFileHandlerDFSBackendInterface' );
-        $this->defaultHandler = $this->getMock( 'eZDFSFileHandlerDFSBackendInterface' );
+        $this->customHandler = $this->getMockBuilder( 'eZDFSFileHandlerDFSBackendInterface' )->setMockClassName( 'CustomHandler')->getMock();
+        $this->defaultHandler = $this->getMockBuilder( 'eZDFSFileHandlerDFSBackendInterface' )->setMockClassName( 'DefaultHandler')->getMock();
 
         $this->dispatcher = new eZDFSFileHandlerDFSDispatcher(
             new eZDFSFileHandlerDFSRegistry(
@@ -121,7 +121,7 @@ class eZDFSFileHandlerDFSDispatcherTest extends ezpTestCase
         $this->customHandler
             ->expects( $this->once() )
             ->method( 'delete' )
-            ->with( $path )
+            ->with( array( $path ) )
             ->will( $this->returnValue( true ) );
 
         self::assertTrue(
@@ -131,7 +131,7 @@ class eZDFSFileHandlerDFSDispatcherTest extends ezpTestCase
 
     public function testArray()
     {
-        $path = array( 'one://file1', 'one://file2', 'two://file3', 'two://file4', 'one://file5';
+        $path = array( 'one://file1', 'one://file2', 'two://file3', 'two://file4', 'one://file5' );
 
         $this->customHandler
             ->expects( $this->once() )
@@ -139,7 +139,7 @@ class eZDFSFileHandlerDFSDispatcherTest extends ezpTestCase
             ->with( array( 'one://file1', 'one://file2', 'one://file5' ) )
             ->will( $this->returnValue( true ) );
 
-        $this->customHandler
+        $this->defaultHandler
             ->expects( $this->once() )
             ->method( 'delete' )
             ->with( array( 'two://file3', 'two://file4' ) )

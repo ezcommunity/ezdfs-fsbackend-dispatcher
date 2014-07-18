@@ -121,7 +121,7 @@ class eZDFSFileHandlerDFSDispatcher implements eZDFSFileHandlerDFSBackendInterfa
             $returnValue &= $handler->delete( $map['files'][$handlerClass] );
         }
 
-        return $returnValue;
+        return (bool)$returnValue;
     }
 
     /**
