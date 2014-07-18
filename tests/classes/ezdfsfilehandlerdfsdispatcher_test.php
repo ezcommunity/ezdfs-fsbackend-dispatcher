@@ -25,7 +25,7 @@ class eZDFSFileHandlerDFSDispatcherTest extends ezpTestCase
     private $customHandler;
 
     /** @var eZDFSFileHandlerDFSBackendInterface[]|PHPUnit_Framework_MockObject_MockObject */
-    private $handlerTwo;
+    private $defaultHandler;
 
     /**
      * The test setup will use two handlers.
@@ -122,6 +122,27 @@ class eZDFSFileHandlerDFSDispatcherTest extends ezpTestCase
             ->expects( $this->once() )
             ->method( 'delete' )
             ->with( $path )
+            ->will( $this->returnValue( true ) );
+
+        self::assertTrue(
+            $this->dispatcher->delete( $path )
+        );
+    }
+
+    public function testArray()
+    {
+        $path = array( 'one://file1', 'one://file2', 'two://file3', 'two://file4', 'one://file5';
+
+        $this->customHandler
+            ->expects( $this->once() )
+            ->method( 'delete' )
+            ->with( array( 'one://file1', 'one://file2', 'one://file5' ) )
+            ->will( $this->returnValue( true ) );
+
+        $this->customHandler
+            ->expects( $this->once() )
+            ->method( 'delete' )
+            ->with( array( 'two://file3', 'two://file4' ) )
             ->will( $this->returnValue( true ) );
 
         self::assertTrue(
