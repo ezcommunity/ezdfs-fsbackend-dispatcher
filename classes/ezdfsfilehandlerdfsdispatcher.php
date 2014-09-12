@@ -112,7 +112,16 @@ class eZDFSFileHandlerDFSDispatcher implements eZDFSFileHandlerDFSBackendInterfa
      */
     public function delete( $filePath )
     {
-        return $this->getHandler( $filePath )->delete( $filePath );
+        $map = $this->mapFilePathArray( (array)$filePath );
+
+        $returnValue = true;
+        /** @var eZDFSFileHandlerDFSBackendInterface $handler */
+        foreach ( $map['handlers'] as $handlerClass => $handler )
+        {
+            $returnValue &= $handler->delete( $map['files'][$handlerClass] );
+        }
+
+        return (bool)$returnValue;
     }
 
     /**
@@ -226,5 +235,35 @@ class eZDFSFileHandlerDFSDispatcher implements eZDFSFileHandlerDFSBackendInterfa
     public function applyServerUri( $filePath )
     {
         return $this->getHandler( $filePath )->applyServerUri( $filePath );
+    }
+
+    /**
+     * Groups file paths from $filePath by handlers.
+     *
+     * @param array $filePath
+     * @param eZDFSFileHandlerDFSBackendInterface[] $handler
+     * @param array $handlerClass
+     *
+     * @return array an array with two sub-arrays
+     *               $return['handlers'] is a hash of eZDFSFileHandlerDFSBackendInterface, indexed by handler  class name
+     *               $return['files'] is a hash of file path  arrays, indexed by handler class name
+     */
+    private function mapFilePathArray( array $filePath )
+    {
+        $map = array( 'handlers' => array(), 'files' => array() );
+        foreach ( $filePath as $path )
+        {
+            $handler = $this->getHandler( $path );
+            $handlerClass = get_class( $handler );
+            if ( !isset( $map['handlers'][$handlerClass] ) )
+            {
+                $map['handlers'][$handlerClass] = $handler;
+                $map['files'][$handlerClass]= array();
+            }
+
+            $map['files'][$handlerClass][] = $path;
+        }
+
+        return $map;
     }
 }
